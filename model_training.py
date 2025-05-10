@@ -14,8 +14,6 @@ BATCH_SIZE = 128
 EPOCHS = 10
 LEARNING_RATE = .001
 
-
-
 class FeedForwardNet(nn.Module):
 
     def __init__(obj):
@@ -78,12 +76,10 @@ def train(model, data_loader, loss_fn, optimiser, device, epochs):
     print("Training is done")
 
 
-    
 
 
 
-
-
+### Run ###############################################################################################
         
 # 1) Download Dataset
 train_data,_ = download_mnist_datasets()

@@ -19,6 +19,8 @@ def predict(model,input,target,class_mapping):
         expected = class_mapping[target]
     return predicted, expected 
 
+### Run ##############################################################################################
+
 # load back the model
 feed_forward_net = FeedForwardNet()
 state_dict = torch.load("feedforwardnet.pth")
