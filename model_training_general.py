@@ -34,8 +34,6 @@ class FeedForwardNet(nn.Module):
         predictions = obj.softmax(logits)
         return predictions
 
-
-
 def download_mnist_datasets():
     train_data = datasets.MNIST(
         root="data",
@@ -52,6 +50,10 @@ def download_mnist_datasets():
     )
 
     return train_data, validation_data
+
+def create_data_loader(train_data, batch_size):
+    train_data_loader = DataLoader(train_data, batch_size=batch_size)
+    return train_data_loader
 
 def train_one_epoch(model, data_loader, loss_fn, optimiser, device):
     for inputs, targets in data_loader:
@@ -86,7 +88,7 @@ train_data,_ = download_mnist_datasets()
 print("MNIST dataset downloaded")
 
 # 2) Create data loader
-train_data_loader = DataLoader(train_data, batch_size=BATCH_SIZE)
+train_data_loader = create_data_loader(train_data, batch_size=BATCH_SIZE)
 
 # 3) Build Model
 if torch.cuda.is_available():
@@ -101,10 +103,9 @@ feed_forward_net = FeedForwardNet().to(device)
 loss_fn = nn.CrossEntropyLoss()
 optimiser = torch.optim.Adam(feed_forward_net.parameters(),lr = LEARNING_RATE)
 train(feed_forward_net, train_data_loader, loss_fn, optimiser, device, EPOCHS)
-torch.save(feed_forward_net.state_dict(), "feedforwardnet.pth")
-print("Model trained and stored at feedforwardnet.pth")
-
 
 # 5) Save trained model
+torch.save(feed_forward_net.state_dict(), "feedforwardnet.pth")
+print("Model trained and stored at feedforwardnet.pth")
     
     

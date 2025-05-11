@@ -1,5 +1,5 @@
 import torch
-from model_training import FeedForwardNet, download_mnist_datasets
+from model_training_general import FeedForwardNet, download_mnist_datasets
 
 # class_mapping = [
 #     "rock",
