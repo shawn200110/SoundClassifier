@@ -20,3 +20,6 @@ UrbanSoundDataset/UrbanSound8K/UrbanSound8K/audio/fold9/.DS_Store
 *.csv
 *.txt
 UrbanSoundDataset/UrbanSound8K/UrbanSound8K/metadata/.DS_Store
+__pycache__/model_training.cpython-313.pyc
+__pycache__/cnn.cpython-313.pyc
+__pycache__/audio_dataset.cpython-313.pyc
