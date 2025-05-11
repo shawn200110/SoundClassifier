@@ -5,10 +5,11 @@ import pandas as pd
 import torchaudio
 
 class UrbanSoundDataset(Dataset):
-    def __init__(obj, annotations_file, audio_dir, transformation, target_sample_rate,num_samples):
+    def __init__(obj,annotations_file,audio_dir,transformation,target_sample_rate,num_samples,device):
         obj.annotations = pd.read_csv(annotations_file)
         obj.audio_dir = audio_dir
-        obj.transformation = transformation
+        obj.device = device
+        obj.transformation = transformation.to(obj.device)
         obj.target_sample_rate = target_sample_rate
         obj.num_samples = num_samples
 
@@ -20,6 +21,7 @@ class UrbanSoundDataset(Dataset):
         audio_sample_path = obj._get_audio_sample_path(index)
         label = obj._get_audio_sample_label(index)
         signal, sr = torchaudio.load(audio_sample_path)
+        signal = signal.to(obj.device)
         signal = obj._resample_if_necessary(signal, sr)
         signal = obj._mix_down_if_necessary(signal) 
         signal = obj._truncate_or_pad(signal)
@@ -71,6 +73,11 @@ AUDIO_DIR = "C:/Users/shawn/OneDrive/Documents/CodeResources/SoundClassifier/Urb
 SAMPLE_RATE = 22050
 NUM_SAMPLES = 22050
 
+if torch.cuda.is_available():
+    device = "cuda"
+else:
+    device = "cpu"
+
 mel_spectrogram = torchaudio.transforms.MelSpectrogram(
     sample_rate=SAMPLE_RATE,
     n_fft=1024,
@@ -78,7 +85,7 @@ mel_spectrogram = torchaudio.transforms.MelSpectrogram(
     n_mels=64
     )
 
-usd = UrbanSoundDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES)
+usd = UrbanSoundDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device)
 
 print(f"There are {len(usd)} samples in the dataset")
 
