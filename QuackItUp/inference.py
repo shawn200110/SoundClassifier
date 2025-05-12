@@ -1,5 +1,9 @@
 import torch
 from cnn import CNNNetwork
+from audio_dataset import DuckDataset
+import torchaudio
+from toolbox import preprocess_audio
+from quack_trainer import AUDIO_DIR, NUM_SAMPLES, ANNOTATIONS_FILE, SAMPLE_RATE
 
 # class_mapping = [
 #     "rock",
@@ -21,18 +25,42 @@ def predict(model,input,target,class_mapping):
 
 ### Run ##############################################################################################
 
-# load back the model
-feed_forward_net = CNN()
-state_dict = torch.load("feedforwardnet.pth")
-feed_forward_net.load_state_dict(state_dict)
 
-# load MNISTvalidation dataset
-_,validation_data = download_mnist_datasets()
+if __name__ == '__main__':
+    # load back the model
+    model = CNNNetwork()
+    state_dict = torch.load("duck_cnn.pth")
+    model.load_state_dict(state_dict)
 
-# get a sample from the validation dataset for inference
-input, target = validation_data[0][0], validation_data[0][1] 
+    # load duck dataset
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
+        sample_rate=SAMPLE_RATE,
+        n_fft=1024,
+        hop_length=512,
+        n_mels=64
+        )
 
-# make an inference
-predicted, expected = predict(feed_forward_net, input, target,class_mapping)
+    dd = DuckDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES,device="cpu")
+    print("Accessed Dataset")
 
-print(f"Predicted: '{predicted}', Expected: '{expected}'")
+    # get a sample from the duck dataset for inference
+    # idx = 45
+    # input, target = dd[idx][0], dd[idx][1] #[batch_size,num_channels, freq, time]
+    # input.unsqueeze_(0)
+    # print("Predicting on:", dd.annotations.iloc[idx, 0])
+
+    # file_path = "TestFiles/duck-attacked-sample.wav"
+    # file_path = "TestFiles/male-laughter-mild-chuckles.wav"
+    file_path = "TestFiles/bird-2.wav"
+    
+    input = preprocess_audio(file_path, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES)
+    target = 1  # dummy label just for formatting (not used in final prediction)
+
+    predicted, _ = predict(model, input, target, class_mapping)
+    print(f"Prediction for '{file_path}': {predicted}")
+
+
+    # make an inference
+    predicted, expected = predict(model, input, target,class_mapping)
+
+    print(f"Predicted: '{predicted}', Expected: '{expected}'")

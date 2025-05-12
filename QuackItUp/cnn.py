@@ -69,5 +69,6 @@ class CNNNetwork(nn.Module):
         return predictions
 
 
-cnn = CNNNetwork()
-summary(cnn, (1,64,44))
+if __name__ == '__main__':
+    cnn = CNNNetwork()
+    summary(cnn, (1,64,44))

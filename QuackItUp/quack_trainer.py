@@ -16,6 +16,10 @@ import torchaudio
 BATCH_SIZE = 128
 EPOCHS = 10
 LEARNING_RATE = .001
+ANNOTATIONS_FILE = "DuckDataset\\audio_files.csv"
+AUDIO_DIR = "DuckDataset\\Clean"
+SAMPLE_RATE = 22050
+NUM_SAMPLES = 22050
 
 
 
@@ -70,40 +74,38 @@ def train(model, data_loader, loss_fn, optimiser, device, epochs):
 ### Run ###############################################################################################
         
 # 1) Download Dataset
-if torch.cuda.is_available():
-    device = "cuda"
-else:
-    device = "cpu"
 
-ANNOTATIONS_FILE = "DuckDataset\\audio_files.csv"
-AUDIO_DIR = "DuckDataset\\Clean"
-SAMPLE_RATE = 22050
-NUM_SAMPLES = 22050
+if __name__ == '__main__':
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
 
-mel_spectrogram = torchaudio.transforms.MelSpectrogram(
-    sample_rate=SAMPLE_RATE,
-    n_fft=1024,
-    hop_length=512,
-    n_mels=64
-    )
 
-dd = DuckDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device)
-print("Accessed Dataset")
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
+        sample_rate=SAMPLE_RATE,
+        n_fft=1024,
+        hop_length=512,
+        n_mels=64
+        )
 
-# 2) Create data loader
-train_data_loader = create_data_loader(dd, batch_size=BATCH_SIZE)
+    dd = DuckDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device)
+    print("Accessed Dataset")
 
-# 3) Build Model
-print(f"Using {device} device")
-cnn = CNNNetwork()
+    # 2) Create data loader
+    train_data_loader = create_data_loader(dd, batch_size=BATCH_SIZE)
 
-# 4) Train
-loss_fn = nn.CrossEntropyLoss()
-optimiser = torch.optim.Adam(cnn.parameters(),lr = LEARNING_RATE)
-train(cnn, train_data_loader, loss_fn, optimiser, device, EPOCHS)
+    # 3) Build Model
+    print(f"Using {device} device")
+    cnn = CNNNetwork().to(device)
 
-# 5) Save trained model
-torch.save(cnn.state_dict(), "feedforwardnet.pth")
-print("Model trained and stored at feedforwardnet.pth")
-    
-    
+    # 4) Train
+    loss_fn = nn.CrossEntropyLoss()
+    optimiser = torch.optim.Adam(cnn.parameters(),lr = LEARNING_RATE)
+    train(cnn, train_data_loader, loss_fn, optimiser, device, EPOCHS)
+
+    # 5) Save trained model
+    torch.save(cnn.state_dict(), "duck_cnn.pth")
+    print("Model trained and stored at duck_cnn.pth")
+        
+        

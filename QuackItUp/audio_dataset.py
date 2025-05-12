@@ -71,7 +71,9 @@ class DuckDataset(Dataset):
         return path
         
     def _get_audio_sample_label(obj, index):
-        return obj.annotations.iloc[index, 2]
+        label_str = obj.annotations.iloc[index, 2]
+        label = 0 if label_str == 'duck_quack' else 1
+        return torch.tensor(label)
     
     
 
@@ -82,35 +84,37 @@ AUDIO_DIR = "DuckDataset\\Clean"
 SAMPLE_RATE = 22050
 NUM_SAMPLES = 22050
 
-if torch.cuda.is_available():
-    device = "cuda"
-else:
-    device = "cpu"
 
-mel_spectrogram = torchaudio.transforms.MelSpectrogram(
-    sample_rate=SAMPLE_RATE,
-    n_fft=1024,
-    hop_length=512,
-    n_mels=64
-    )
+if __name__ == "__main__":
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
 
-usd = DuckDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device)
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
+        sample_rate=SAMPLE_RATE,
+        n_fft=1024,
+        hop_length=512,
+        n_mels=64
+        )
 
-print(f"There are {len(usd)} samples in the dataset")
+    usd = DuckDataset(ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device)
 
-signal, label = usd[1]
+    print(f"There are {len(usd)} samples in the dataset")
+
+    signal, label = usd[1]
 
 
-# indexes = np.array([0,5,10,15,20,25,55,60,65,70,75,80])
+    # indexes = np.array([0,5,10,15,20,25,55,60,65,70,75,80])
 
 
-# for i in range(len(indexes)):  
-    
-#     signal, label = usd[indexes[i]]
-#     mel = signal.squeeze().cpu().numpy()
-#     plt.subplot(4, 3, i+1) 
-#     plt.imshow(mel, origin='lower', aspect='auto', cmap='magma')
-#     plt.title(indexes[i])
-#     plt.tight_layout()
-    
-# plt.show()
+    # for i in range(len(indexes)):  
+        
+    #     signal, label = usd[indexes[i]]
+    #     mel = signal.squeeze().cpu().numpy()
+    #     plt.subplot(4, 3, i+1) 
+    #     plt.imshow(mel, origin='lower', aspect='auto', cmap='magma')
+    #     plt.title(indexes[i])
+    #     plt.tight_layout()
+        
+    # plt.show()
