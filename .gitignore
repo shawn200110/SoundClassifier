@@ -23,3 +23,8 @@ UrbanSoundDataset/UrbanSound8K/UrbanSound8K/metadata/.DS_Store
 __pycache__/model_training.cpython-313.pyc
 __pycache__/cnn.cpython-313.pyc
 __pycache__/audio_dataset.cpython-313.pyc
+*.reapeaks
+*.mp3
+*.pyc
+*.flac
+*.ogg
